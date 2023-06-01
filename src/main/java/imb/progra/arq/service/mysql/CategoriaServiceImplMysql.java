@@ -1,6 +1,7 @@
 package imb.progra.arq.service.mysql;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -18,7 +19,7 @@ public class CategoriaServiceImplMysql implements ICategoriaService {
 	CategoriaRepository repo;
 
 	@Override
-	public List<Categoria> mostrarCategorias() {		
+	public List<Categoria> buscarCategorias() {		
 		return repo.findAll();
 
 	}
@@ -32,6 +33,17 @@ public class CategoriaServiceImplMysql implements ICategoriaService {
 	@Override
 	public void eliminarCategoria(Integer id) {
 		repo.deleteById(id);		
+	}
+
+	@Override
+	public Categoria buscarCategoriaPorId(Integer id) {
+		Optional<Categoria> optional;
+		optional = repo.findById(id);
+		if(optional.isPresent()) {
+			return optional.get();
+		}else {
+			return null;
+		}
 	}
 
 }
