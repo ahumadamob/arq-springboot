@@ -32,6 +32,25 @@ public class CategoriaController {
 	//public ResponseEntity<APIResponse<List<Project>>> 
 	//APIResponse<List<Project>> response = new APIResponse<List<Project>>(200, addSingleMessage("No hay elementos"), projects);
 	///return ResponseEntity.status(HttpStatus.OK).body(response);	
+	
+	/*
+	@GetMapping
+	public List<Categoria> mostrarTodos(){
+		return categoriaService.buscarCategorias();
+		
+	} //Version1 del Get*/
+	
+	
+	/*
+	@GetMapping
+	public ResponseEntity<List<Categoria>> mostrarTodos(){
+		//return categoriaService.buscarCategorias();
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(categoriaService.buscarCategorias());
+	
+	} //Version 2 del Get	
+	*/
+	
+	
 	@GetMapping
 	public ResponseEntity<APIResponse<List<Categoria>>> mostrarTodos() {		
 		APIResponse<List<Categoria>> response = new APIResponse<List<Categoria>>(200, null, categoriaService.buscarCategorias());
@@ -44,18 +63,14 @@ public class CategoriaController {
 		if(categoria == null) {
 			List<String> messages = new ArrayList<>();
 			messages.add("No se encontró la Categoría con id = " + id.toString());
-			APIResponse<Categoria> response = new APIResponse<Categoria>(200, messages, categoria);
-			return ResponseEntity.status(HttpStatus.OK).body(response);	
+			messages.add("Revise nuevamente el parámetro");
+			APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.BAD_REQUEST.value(), messages, null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);	
 		}else {
-			APIResponse<Categoria> response = new APIResponse<Categoria>(200, null, categoria);
+			APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.OK.value(), null, categoria);
 			return ResponseEntity.status(HttpStatus.OK).body(response);	
-		}
-		
-		
-				
+		}		
 	}
-	
-	
 	
 	@PostMapping
 	public Categoria crearCategoria(@RequestBody Categoria categoria) {
