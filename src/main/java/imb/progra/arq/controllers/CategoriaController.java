@@ -73,20 +73,76 @@ public class CategoriaController {
 	}
 	
 	@PostMapping
-	public Categoria crearCategoria(@RequestBody Categoria categoria) {
+	public ResponseEntity<APIResponse<Categoria>> crearCategoria(@RequestBody Categoria categoria) {
+		if(categoria.getId() != null) {
+			Categoria buscaCategoria = categoriaService.buscarCategoriaPorId(categoria.getId());
+			if(buscaCategoria != null) {
+				List<String> messages = new ArrayList<>();
+				messages.add("Ya existe una categoria con el ID = " + categoria.getId().toString());
+				messages.add("Para actualizar utilice el verbo PUT");
+				APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.BAD_REQUEST.value(), messages, null);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+			}
+		}
 		categoriaService.guardarCategoría(categoria);
-		return categoria;
+		APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.CREATED.value(), null, categoria);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);	
 	}
 	
 	@PutMapping	
-	public Categoria modificarCategoria(@RequestBody Categoria categoria) {
-		categoriaService.guardarCategoría(categoria);
-		return categoria;
+	public ResponseEntity<APIResponse<Categoria>> modificarCategoria(@RequestBody Categoria categoria) {
+		boolean isError ;
+		String idStr;
+		if(categoria.getId() != null){
+			Categoria buscaCategoria = categoriaService.buscarCategoriaPorId(categoria.getId());
+			idStr = categoria.getId().toString();
+			if(buscaCategoria != null) {
+				// Devolver un OK
+				isError = false;
+			}else {
+				// Devolver un Error
+				isError = true;
+			}
+		}else {
+			idStr = "<No definido>";
+			// Devolver un error
+			isError = true;
+		}
+		
+		if(isError) {
+			// Devolvemos el error
+			List<String> messages = new ArrayList<>();
+			messages.add("No existe una categoria con el ID = " + idStr);
+			messages.add("Para crear una nueva utilice el verbo POST");
+			APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.BAD_REQUEST.value(), messages, null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}else {
+			// Devolvemos el OK
+			categoriaService.guardarCategoría(categoria);
+			APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.OK.value(), null, categoria);
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+
 	}
 	
 	@DeleteMapping("/{id}")
-	public void eliminarCategoria(@PathVariable("id") Integer id) {
-		categoriaService.eliminarCategoria(id);
+	public ResponseEntity<APIResponse<Categoria>> eliminarCategoria(@PathVariable("id") Integer id) {
+		Categoria buscaCategoria = categoriaService.buscarCategoriaPorId(id);
+		if(buscaCategoria == null) {
+			// Error
+			List<String> messages = new ArrayList<>();
+			messages.add("No existe una categoria con el ID = " + id.toString());
+			APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.BAD_REQUEST.value(), messages, null);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);			
+		}else {
+			categoriaService.eliminarCategoria(id);
+			List<String> messages = new ArrayList<>();
+			messages.add("La Categoria que figura en el cuerpo ha sido eliminada") ;			
+			APIResponse<Categoria> response = new APIResponse<Categoria>(HttpStatus.OK.value(), messages, buscaCategoria);
+			return ResponseEntity.status(HttpStatus.OK).body(response);			
+			// eliminar
+		}
+		
 	}
 	
 	
