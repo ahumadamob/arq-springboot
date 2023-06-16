@@ -37,13 +37,12 @@ public class CategoriaServiceImplMysql implements ICategoriaService {
 
 	@Override
 	public Categoria buscarCategoriaPorId(Integer id) {
-		Optional<Categoria> optional;
-		optional = repo.findById(id);
+		Optional<Categoria> optional = repo.findById(id);
 		if(optional.isPresent()) {
 			return optional.get();
 		}else {
 			return null;
-		}
+		}		
 	}
 
 }
